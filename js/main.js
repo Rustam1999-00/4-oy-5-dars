@@ -8,22 +8,43 @@ var elList = document.querySelector('.js-list')
 var elAllbtn = document.querySelector('.allbtn')
 var elCombtn = document.querySelector('.combtn')
 var elUpbtn = document.querySelector('.upbtn')
+var elDelbtn = document.querySelector('.deletebtn');
+var elGroupbtn = document.querySelector('.js-groupbtn')
+
 
 
 var elAll = document.querySelector('.js-all')
 var elCompleted = document.querySelector('.js-Completed')
 var elUpCompleted = document.querySelector('.js-up-Completed')
+var elTop = document.querySelector('.js-top')
+
+var elDark = document.querySelector('.js-darkbtn')
+var elBody = document.querySelector('body')
+
+elDark.addEventListener('click',function(){
+    elBody.classList.toggle('dark')
+})
 
 
-let todo = []
+
+
+
+let todosData = JSON.parse(window.localStorage.getItem('todos'))
+
+
+
+
+
+let todo = todosData || []
+
 
 
 let rendertodo = (arrey,node)=>{
 
     node.innerHTML = ''
-
-arrey.forEach((item)=>{
-
+    
+    arrey.forEach((item)=>{
+        
 
     let elnewitem = document.createElement('li')
     elnewitem.setAttribute('class', 'list-group-item d-flex aligIn-items-center')
@@ -67,13 +88,31 @@ if(item.isCamplaet){
 
 
 elAll.textContent = todo.length
+elCompleted.textContent = arrey.filter((el)=>el.isCamplaet).length;
+elUpCompleted.textContent = arrey.filter((el)=>!el.isCamplaet).length
+
+
+
+
+
 
 elAllbtn.addEventListener('click',function(evt){
     rendertodo(todo,elList)
 })
 
 
+
 }
+if(todo.length !== 0){
+    rendertodo(todo,elList)
+}
+else{
+    let criteH = document.createElement('h2');
+    criteH.textContent = "Todo'lar yo'q";
+    criteH.setAttribute('class','text-center text-danger')
+    elList.appendChild(criteH)
+}
+
 
 elForm.addEventListener("submit",function(evt){
     evt.preventDefault();
@@ -83,17 +122,18 @@ elForm.addEventListener("submit",function(evt){
 
 
     let newobc = {
-        id: todo.length+1,
+        id: todo.length ? todo[todo.length-1].id + 1:1,
         text:elInput.value,
         isCamplaet:false 
     }
     todo.push(newobc)
     rendertodo(todo,elList)
 
-    
-
-
     elInput.value = ""
+
+    window.localStorage.setItem('todos',JSON.stringify(todo))
+
+
 })
 
 
@@ -143,37 +183,36 @@ elList.addEventListener('click',function(evt){
         rendertodo(todo,elList)
     }
 
-const com = []
-elCombtn.addEventListener('click',function (evt){
 
-    const complet = todo.filter((item)=> item.isCamplaet == true);
-    elCompleted.textContent = complet.length
 
-    com.push(complet);
 
-    elCompleted.textContent = complet.length
-    rendertodo(com,elList)
-    
+
+
+
 })
-  
 
-const up = []
-elCombtn.addEventListener('click',function (evt){
+elGroupbtn.addEventListener('click',function(evt){
+if(evt.target.matches('.combtn')){
 
-    if( elUpCompleted.textContent == 0){
-        const upcomplet = todo.filter((item)=> item.isCamplaet == false);
-        elUpCompleted.textContent = upcomplet.length
-    
-        up.push(upcomplet);
-    
-        rendertodo(up,elList)
-    }
+    let combtnclick = todo.filter((item)=>item.isCamplaet);
+    rendertodo(combtnclick,elList)
+};
+if(evt.target.matches('.upbtn')){
+
+    let combtnclick = todo.filter((item)=>!item.isCamplaet);
+    rendertodo(combtnclick,elList)
+};
+
+if(evt.target.matches('.deletebtn')){
+   let deleteb = todo.length == 0
+   rendertodo(deleteb,elList)
+}
+})
    
-    
-})
-
-
-
-
-
-})
+    // window.addEventListener('scroll',function(evt){
+    //     if(window.scrollY < 1500){
+    //         elTop.style.display = 'none'
+    //     }else{
+    //         elTop.style.display = 'inherit'
+    //     }
+    // })
